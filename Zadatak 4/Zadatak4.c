@@ -1,7 +1,8 @@
-//Napisati program za zbrajanje i množenje polinoma.Koeficijenti i eksponenti se
-//èitaju iz datoteke.
-//Napomena: Eksponenti u datoteci nisu nužno sortirani.
+//Napisati program za zbrajanje i mnozenje polinoma.Koeficijenti i eksponenti se
+//citaju iz datoteke.
+//Napomena: Eksponenti u datoteci nisu nuzno sortirani.
 
+#define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -44,10 +45,10 @@ int main()
 
 	printf("Unesite ime datoteke:");
 	scanf(" %s", Dat);
-	
+
 	while (odabir != 0)
 	{
-		system("cls"); //cisti cmd
+		system("cls");
 		printf("Sto zelite uciniti s polinomima?\n");
 		printf("Zbrojiti ih - 1\n");
 		printf("Pomnoziti ih - 2\n");
@@ -102,7 +103,7 @@ int main()
 }
 
 int CitanjePolinomaIzDat(Position Head1, Position Head2, char* Dat)
-{//
+{
 	FILE* fp = NULL;
 	char buffer[MAX_LINE] = { 0 };
 
@@ -113,7 +114,7 @@ int CitanjePolinomaIzDat(Position Head1, Position Head2, char* Dat)
 		system("pause > nul");
 		return -1;
 	}
-	
+
 	fgets(buffer, MAX_LINE, fp);
 	CitajRetke(Head1, buffer);
 	PonistiNulu(Head1);
@@ -132,22 +133,19 @@ int CitanjePolinomaIzDat(Position Head1, Position Head2, char* Dat)
 
 int CitajRetke(Position Head, char* buffer)
 {
-	char* pointer = NULL;
 	int koef, pot;
 	int brojac = 0;
 	int nB = 0;
 
-	pointer = buffer; //char buffer=NULL;??
-
-	while (strlen(pointer) > 0)
+	while (strlen(buffer) > 0)
 	{
-		nB = sscanf(pointer, " %d %d %n", &koef, &pot, &brojac);
-		
+		nB = sscanf(buffer, " %d %d %n", &koef, &pot, &brojac);
+
 
 		if (nB == 2 && koef != 0)
 			UnosSortirano(Head, StvoriPolinom(koef, pot));
 
-		pointer += brojac;
+		buffer += brojac;
 	}
 
 	return EXIT_SUCCESS;
@@ -179,12 +177,6 @@ Position StvoriPolinom(int k, int p)
 
 	noviElement = (Position)malloc(sizeof(Poli));
 
-	/*if (!noviElement)
-	{
-		perror("Greska pri alokaciji memorije!\n");
-		return noviElement;
-	}*/
-
 	noviElement->koef = k;
 	noviElement->pot = p;
 	noviElement->next = NULL;
@@ -192,7 +184,7 @@ Position StvoriPolinom(int k, int p)
 	return noviElement;
 }
 
-int UnosSortirano(Position Head, Position noviElement)//skuziti jos bolje
+int UnosSortirano(Position Head, Position noviElement)
 {
 	Position temp1 = Head;
 	Position temp2 = noviElement;
