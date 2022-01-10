@@ -13,220 +13,261 @@ c) Prepraviti program na nacin da umjesto predefiniranog cjelobrojnog polja kori
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <malloc.h>
-#include <time.h>
-#include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
 
-#define LINE 1024
-#define COUNT 10
+#define MAX_SIZE 128
+#define MAX_LINE 1024
 
-struct _Tree;
-typedef struct _Tree* Position;
-
-typedef struct _Tree{
+struct tree;
+typedef struct tree* Position;
+typedef struct tree
+{
 	int el;
 	Position L;
 	Position R;
 }Tree;
 
-Position CreateElement(int element);
+struct stack;
+typedef struct stack* SPosition;
+typedef struct stack
+{
+	int el;
+	SPosition next;
+}Stack;
+
 Position Insert(Position curr, Position new);
-int Replace(Position current);
-//int ToFile(Position head, char* ime);
+Position CreateNew(int number, Position curr);
+int PrintInOrder(Position curr);
+int Replace(Position curr);
+int DeleteAll(Position curr);
+int PopStack(SPosition head);
+int PushStack(SPosition head, int element);
+int ToFile(SPosition head, Position root, char* name);
+int ToStack(SPosition head, Position curr);
 int RandomNum(int min, int max);
-int Inorder(Position curr);
-int ToFile(Position current, FILE* fp);
 
 int main()
 {
-	char* file = "stablo.txt";
-	Position head = NULL;
-	Position first = NULL;
 	Position root = NULL;
-	Position temp = NULL;
-
-	int list1[10] = {2, 5, 7, 8, 11, 1, 4, 2, 3, 7};
-	int list2[10] = {0};
-	int min = 0;
-	int max = 0;
+	srand((unsigned)time(NULL));
+	Stack head;
+	head.el = 0;
+	head.next = NULL;
+	char name[MAX_SIZE] = { 0 };
 	int i = 0;
+	int n;
 
-	srand(time(NULL));
+	printf("Enter the wanted file name: ");
+	scanf(" %s", name);
 
-	head = (Position)malloc(sizeof(Tree));
+	int list[10] = { 2, 5, 7, 8, 11, 1, 4, 2, 3, 7 };
 
 	for (i = 0; i < 10; i++)
 	{
-		temp = CreateElement(list1[i]);
-		if (i == 0)
-		{
-			first = temp;
-		}
-		else
-		{
-		Insert(first, temp);
-		}
+		root = CreateNew(list[i], root);
 	}
 
-	printf("(Inorder) print before the sum operation: \n");
-	Inorder(first);
+	PrintInOrder(root);
+	printf("\n");
 
-	Replace(first);
+	ToStack(&head, root);
+	ToFile(&head, root, name);
 
-	puts("\n\n");
+	Replace(root);
 
-	head->el = 0;
-	head->L = NULL;
-	head->R = NULL;
+	PrintInOrder(root);
+	printf("\n");
 
-	printf("(Inorder) print after the sum operation: \n");
-	Inorder(first);
+	ToStack(&head, root);
+	ToFile(&head, root, name);
 
-	first = head->R;
+	DeleteAll(root);
 
-	while (first != NULL)
-	{
-		printf("%d ", first->el);
-		first = first->R;
-	}
+	int min, max, nodes;
 
-	puts("\n\n");
-
-	ToFile(head, file);
-
+	printf("\nEnter the wanted number of nodes: ");
+	scanf(" %d", &nodes);
 	printf("Enter the limits of random numbers:\n");
 	printf("Low: ");
 	scanf(" %d", &min);
+	if (min < 10) {
+		printf("Number is too low, it must be bigger than 9!\n");
+		scanf(" %d", &min);
+	}
 	printf("High: ");
 	scanf(" %d", &max);
-
-	puts("\n");
-	
-	for (i = 0; i < 10; i++)
-	{
-		list2[i] = RandomNum(min, max);
+	if (max > 90) {
+		printf("Number is too high, it must be lower than 90!\n");
+		scanf(" %d", &min);
 	}
 
-	for (i = 0; i < 10; i++)
+	root = NULL;
+
+	for (i = 0; i < nodes; i++)
 	{
-		temp = CreateElement(list2[i]);
-		if (i == 0)
-		{
-			first = temp;
-		}
-		else
-		{
-			Insert(first, temp);
-		}
+		root = CreateNew((rand() % (max - min - 1) + min + 1), root);
 	}
 
-	Inorder(first);
-
-	Replace(first);
-
-	puts("\n");
+	PrintInOrder(root);
 
 	return 0;
 }
 
-Position CreateElement(int element)
-{
-	Position new = NULL;
-	new = (Position)malloc(sizeof(Tree));
-	new->el = element;
-	new->L = NULL;
-	new->R = NULL;
-	return new;
-}
-
 Position Insert(Position curr, Position new)
 {
-	if (curr == NULL)
+	if (NULL == curr)
 	{
 		return new;
 	}
-	if ((curr->el) <= (new->el))
+	else if (new->el < curr->el)
 	{
 		curr->R = Insert(curr->R, new);
 	}
-	else if ((curr->el) > (new->el))
+	else
 	{
 		curr->L = Insert(curr->L, new);
 	}
+
 	return curr;
 }
 
-int Inorder(Position curr)
+Position CreateNew(int number, Position curr)
 {
-	if (curr)
+	Position new = NULL;
+
+	new = (Position)malloc(sizeof(Tree));
+	if (!new)
 	{
-		Inorder(curr->L);
-		printf("%d ", curr->el);
-		Inorder(curr->R);
+		perror("ERROR: Allocation failed!");
+		return NULL;
 	}
 
-	return EXIT_SUCCESS;
+	new->el = number;
+	new->L = NULL;
+	new->R = NULL;
+
+	new = Insert(curr, new);
+
+	return new;
 }
 
-
-int Replace(Position current)
+int PrintInOrder(Position curr)
 {
-	int L1 = 0;
-	int D1 = 0;
-	int L2 = 0;
-	int D2 = 0;
-
-	if (current != NULL)
+	if (!curr)
 	{
-		if (current->L != NULL)
-		{
-			L1 = current->L->el;
-		}
-		if (current->R != NULL)
-		{
-			D1 = current->R->el;
-		}
-
-		Replace(current->L);
-		Replace(current->R);
-
-		if (current->L != NULL)
-		{
-			L2 = current->L->el;
-		}
-
-		if (current->R != NULL)
-		{
-			D2 = current->R->el;
-		}
-
-		return current->el = L2 + D2 + L1 + D1;
-	}
-	return EXIT_SUCCESS;
-}
-
-int ToFile(Position head, char* name)
-{
-	FILE* dat = NULL;
-	Position temp;
-
-	temp = head->R;
-	dat = fopen(name, "w");
-
-	while (temp != NULL)
-	{
-		fprintf(dat, "%d ", temp->el);
-		temp = temp->R;
+		return 0;
 	}
 
-	fclose(dat);
+	PrintInOrder(curr->L);
+	printf("%d ", curr->el);
+	PrintInOrder(curr->R);
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 
+int Replace(Position curr)
+{
+	int sum = 0;
+	int temp = 0;
+
+	if (NULL != curr)
+	{
+		sum = Replace(curr->L);
+		sum += Replace(curr->R);
+
+		temp = curr->el;
+		curr->el = sum;
+		sum += temp;
+	}
+
+	return sum;	
+}
+
+int DeleteAll(Position curr)
+{
+	if (curr == NULL)
+	{
+		return 0;
+	}
+
+	DeleteAll(curr->L);
+	DeleteAll(curr->R);
+
+	free(curr);
+
+	return 0;
+}
+
+int PopStack(SPosition head)
+{
+	if (!head->next)
+	{
+		return 0;
+	}
+
+	SPosition delete = head->next;
+	head->next = delete->next;
+	free(delete);
+
+	return 0;
+}
+
+int PushStack(SPosition head, int el)
+{
+	SPosition new = NULL;
+	new = (SPosition)malloc(sizeof(Stack));
+	if (!new)
+	{
+		perror("ERROR: Allocation failed!\n");
+		return -1;
+	}
+
+	new->el = el;
+	new->next = head->next;
+	head->next = new;
+
+	return 0;
+}
+
+int ToStack(SPosition head, Position curr)
+{
+	if (NULL == curr)
+	{
+		return 0;
+	}
+
+	ToStack(head, curr->R);
+	PushStack(head, curr->el);
+	ToStack(head, curr->L);
+
+	return 0;
+}
+
+int ToFile(SPosition head, Position root, char* name)
+{
+	FILE* file = NULL;
+
+	file = fopen(name, "a");
+	if (!file)
+	{
+		perror("ERROR: File opening failed!\n");
+		return -1;
+	}
+
+	while (head->next)
+	{
+		fprintf(file, "%d ", head->next->el);
+		PopStack(head);
+	}
+
+	fprintf(file, "\n");
+
+	fclose(file);
+
+	return 0;
+}
 
 int RandomNum(int min, int max)
 {
@@ -234,7 +275,9 @@ int RandomNum(int min, int max)
 	n = max - min + 1;
 	int m = RAND_MAX - (RAND_MAX % n);
 	int rand_num = rand();
-	while (rand_num > m)
-		rand_num = rand();
+	if (rand_num < 99 && rand_num > 100) {
+		while (rand_num > m)
+			rand_num = rand();
+	}
 	return rand_num % n + min;
 }
