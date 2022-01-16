@@ -1,9 +1,9 @@
-/*Napisati program koji Ëita datoteku drzave.txt u kojoj su zapisani nazivi pojedinih drûava.Uz
-ime drûave u datoteci se nalazi i ime dodatne datoteke u kojoj se nalaze gradovi pojedine
-drûave.Svaka datoteka koja predstavlja drûavu sadrûi popis gradova u formatu naziv_grada,
+/*Napisati program koji √®ita datoteku drzave.txt u kojoj su zapisani nazivi pojedinih dr≈æava.Uz
+ime dr≈æave u datoteci se nalazi i ime dodatne datoteke u kojoj se nalaze gradovi pojedine
+dr≈æave.Svaka datoteka koja predstavlja dr≈æavu sadr≈æi popis gradova u formatu naziv_grada,
 broj_stanovnika.
-a) Potrebno je formirati sortiranu vezanu listu drûava po nazivu.Svaki Ëvor vezane liste
-sadrûi stablo gradova sortirano po broju stanovnika, zatim po nazivu grada.*/
+a) Potrebno je formirati sortiranu vezanu listu dr≈æava po nazivu.Svaki √®vor vezane liste
+sadr≈æi stablo gradova sortirano po broju stanovnika, zatim po nazivu grada.*/
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -31,11 +31,11 @@ typedef struct countries{
 
 int AddCountry(char* NameOfCountry, char* file, Position P);
 int AddCity(char* file, Tree S);
-Tree EnterCity(char* ime, int brojstan, Tree S);
+Tree EnterCity(char* Name, int residents, Tree S);
 int PrintCountries(Position P);
 int PrintCities(Tree S);
-Position SearchCountry(Position P, char* ime);
-int SearchCity(Tree S, int brojst);
+Position SearchCountry(Position P, char* NameOfCountry);
+int SearchCity(Tree S, int residents);
 
 int main()
 {
