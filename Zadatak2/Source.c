@@ -6,14 +6,6 @@
 //E.briše odreðeni element iz liste,
 //U zadatku se ne smiju koristiti globalne varijable.
 
-//Definirati strukturu osoba(ime, prezime, godina roðenja) i napisati program koji :
-//A.dinamièki dodaje novi element na poèetak liste,
-//B.ispisuje listu,
-//C.dinamièki dodaje novi element na kraj liste,
-//D.pronalazi element u listi(po prezimenu),
-//E.briše odreðeni element iz liste,
-//U zadatku se ne smiju koristiti globalne varijable.
-
 #define _CRT_SECURE_NO_WARNINGS
 #define MAX_STRING 128
 
