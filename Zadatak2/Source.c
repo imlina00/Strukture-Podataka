@@ -1,51 +1,60 @@
-//Definirati strukturu osoba(ime, prezime, godina ro�enja) i napisati program koji :
-//A.dinami�ki dodaje novi element na po�etak liste,
+//Definirati strukturu osoba(ime, prezime, godina roðenja) i napisati program koji :
+//A.dinamièki dodaje novi element na poèetak liste,
 //B.ispisuje listu,
-//C.dinami�ki dodaje novi element na kraj liste,
+//C.dinamièki dodaje novi element na kraj liste,
 //D.pronalazi element u listi(po prezimenu),
-//E.bri�e odre�eni element iz liste,
+//E.briše odreðeni element iz liste,
 //U zadatku se ne smiju koristiti globalne varijable.
+
+//Definirati strukturu osoba(ime, prezime, godina roðenja) i napisati program koji :
+//A.dinamièki dodaje novi element na poèetak liste,
+//B.ispisuje listu,
+//C.dinamièki dodaje novi element na kraj liste,
+//D.pronalazi element u listi(po prezimenu),
+//E.briše odreðeni element iz liste,
+//U zadatku se ne smiju koristiti globalne varijable.
+
+#define _CRT_SECURE_NO_WARNINGS
+#define MAX_STRING 128
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<string.h>
-
-#define MAX_SIZE 50
 
 struct _Person;
 typedef struct _Person* Position;
+
 typedef struct _Person {
-	char name[MAX_SIZE];
-	char surname[MAX_SIZE];
-	int birthYear;
+	char name[MAX_STRING];
+	char surname[MAX_STRING];
+	int BirthYear;
 	Position next;
 }Person;
 
-int PrependList(Position Head, char* name, char* surname, int birthYear);
-int PrintList(Position Head);
-int AppendList(Position Head, char* name, char* surname, int birthYear);
-Position CreatePerson(char* name, char* surname, int birthYear);
-int InsertAfter(Position Last, Position newPerson);
+Position Create(char* name, char* surname, int birthyear);
+int AddOnBeginning(Position Head, char* name, char* surname, int birthyear);//prepend
+int InsertAfter(Position last, Position new);
+int Print(Position Head);
+int AddOnEnd(Position Head, char* name, char* surname, int birthyear);//NE RADI
 Position FindLast(Position Head);
 int FindBySurname(Position Head, char* surname);
-Position FindBefore(Position Head);
-int ToDelete(Position Head, char* surname);
+Position DeleteWanted(Position Head, char* surname);//NE RADI
+Position FindBefore(Position Head);//doddatak za brisanje
+//int Menu();
 
-int main(int argc, char** argv)
-{
-	Person Head = { .next = NULL, .name = {0}, .surname = {0}, 
-		.birthYear = 0 };
+int main() {
+	Person Head = { .next = NULL, .name = {0}, .surname = {0},
+	.BirthYear = 0 };
 	Position P = &Head;
 
 	int answer = 1;
-	char name[MAX_SIZE] = {' '};
-	char surname[MAX_SIZE] = {' '};
-	int birthYear = 0;
+	char name[MAX_STRING] = { ' ' };
+	char surname[MAX_STRING] = { ' ' };
+	int birthyear = 0;
 
-	while (answer != 0)
+	while (answer)
 	{
 		system("cls"); // nadodaj ovo da se "refresha" pojava narednih printf linija a lista se spremi i pise iznova !!!
-		PrintList(P);
+		Print(P->next);
 		printf("\nSto zelite uciniti?\n");
 		printf("\tUnijeti studenta na pocetak liste (1)\n");
 		printf("\tUnijeti studenta na kraj liste (2)\n");
@@ -60,16 +69,16 @@ int main(int argc, char** argv)
 			printf("\nUnesite ime i prezime studenta na pocetak liste: ");
 			scanf(" %s %s", name, surname);
 			printf("Unesite godinu rodjenja studenta: ");
-			scanf(" %d", &birthYear);
-			PrependList(P, name, surname, birthYear);
+			scanf(" %d", &birthyear);
+			AddOnBeginning(P, name, surname, birthyear);//saljemo adresu head-a
 			break;
 
 		case 2:
 			printf("\nUnesite ime i prezime studenta na kraj liste: ");
 			scanf(" %s %s", name, surname);
 			printf("Unesite godinu rodjenja studenta: ");
-			scanf(" %d", &birthYear);
-			AppendList(P, name, surname, birthYear);
+			scanf(" %d", &birthyear);
+			AddOnEnd(P, name, surname, birthyear);
 			break;
 
 		case 3:
@@ -81,132 +90,125 @@ int main(int argc, char** argv)
 		case 4:
 			printf("\nUnesite prezime studenta kojega zelite izbrisati: ");
 			scanf(" %s", surname);
-			ToDelete(P, surname);
+			DeleteWanted(P, surname);//saljemo adresu
 			break;
 		}
 	}
 
-	//mozemo jos nadodati da se ispisuje greska ukoliko se upise broj koji nije u intervalu od 1-4 ili prezime koje ne postoji
-
 	return EXIT_SUCCESS;
 }
 
-int PrependList(Position Head, char* name, char* surname, int birthYear)
-{
+Position Create(char* name, char* surname, int birthyear) {
+
+	Position q = NULL;
+
+	q = (Position)malloc(sizeof(Person));
+	if (!q) {
+		perror("Can't allocate memory!\n");
+		return -1;
+	}
+
+	strcpy(q->name, name);
+	strcpy(q->surname, surname);
+	q->BirthYear = birthyear;
+	q->next = NULL;
+
+	return q;
+}
+
+int AddOnBeginning(Position Head, char* name, char* surname, int birthyear) {
 	Position newPerson = NULL;
 
-	newPerson = CreatePerson(name, surname, birthYear);
+	newPerson = Create(name, surname, birthyear);
 	if (!newPerson) {
 		perror("Can't allocate memory!\n");
 		return -1;
 	}
 
-	InsertAfter(Head, newPerson);
+	InsertAfter(Head, newPerson);//u ovu fju saljemo adresa head-a
 
 	return EXIT_SUCCESS;
 }
-Position CreatePerson(char* name, char* surname, int birthYear)
-{
-	Position newPerson = NULL;
 
-	newPerson = (Position)malloc(sizeof(Person));
+int InsertAfter(Position head, Position new) {
+	new->next = head->next;
+	head->next = new;
+
+	return EXIT_SUCCESS;
+}
+
+int Print(Position P) {
+	while (P != NULL) {
+		printf("%s %s, %d. godine\n", P->name, P->surname, P->BirthYear);
+		P = P->next;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+int AddOnEnd(Position Head, char* name, char* surname, int birthyear) {//adresa head-a
+	Position newPerson = NULL;
+	Position last = NULL;
+
+	newPerson = Create(name, surname, birthyear);
 	if (!newPerson) {
 		perror("Can't allocate memory!\n");
 		return -1;
 	}
 
-	strcpy(newPerson->name, name);
-	strcpy(newPerson->surname, surname);
-	newPerson->birthYear = birthYear;
-	newPerson->next = NULL;
-
-	return newPerson;
-}
-
-int PrintList(Position Head) 
-{
-	Position temp = Head->next;
-	while (temp) {
-		printf("Ime: %s, prezime: %s, godina rodjenja: %d\n", 
-			temp->name, temp->surname, temp->birthYear);
-		temp = temp->next;
-	}
-
+	last = FindLast(Head);//adresa head-a
+	InsertAfter(last, newPerson);
 	return EXIT_SUCCESS;
 }
 
-int AppendList(Position Head, char* name, char* surname, int birthYear)
-{
-	Position newPerson = NULL;
-	Position Last = NULL;
-
-	newPerson = CreatePerson(name, surname, birthYear);
-	if (!newPerson) {
-		perror("Can't allocate memory!\n");
-		return -1;
-	}
-
-	Last = FindLast(Head);
-	InsertAfter(Last, newPerson);
-
-	return EXIT_SUCCESS;
-}
-
-Position FindLast(Position Head)
-{
+Position FindLast(Position Head) {
 	Position temp = Head;
-	while (temp->next)
-	{
+
+	while (temp->next != NULL) {
 		temp = temp->next;
 	}
+
 	return temp;
 }
 
-int InsertAfter(Position Last, Position newPerson)
-{
-	newPerson->next = Last->next;
-	Last->next = newPerson;
-
-	return EXIT_SUCCESS;
-}
-
-int FindBySurname(Position Head, char* surname)
-{
+int FindBySurname(Position Head, char* surname) {//adresa head-a
 	Position temp = Head->next;
 
-	while (temp)
-	{
+	while (temp != NULL) {
 		if (strcmp(temp->surname, surname) == 0) {
-			printf("\nTrazeni student je %s %s, %d.\n", temp->name, temp->surname, temp->birthYear);
+			printf("\nWanted student is: %s %s, %d.\n", temp->name, temp->surname, temp->BirthYear);
 			system("pause > nul"); // nadodaj da "ponistis" system("cls") iz main-a (47)
 			return temp;
-			}
+		}
 		temp = temp->next;
 	}
+
 	return EXIT_SUCCESS;
 }
 
-Position FindBefore(Position Head) 
-{
-	Position temp = Head->next;
-	while (temp) {
-		temp = Head->next;
-		if (temp == NULL) return NULL;
-		else return Head;
-	}
-	return temp;
-}
+Position DeleteWanted(Position Head, char* surname) {//adresa head-a
+	Position temp = Head;
+	Head = FindBefore(surname, temp);
 
-int ToDelete(Position Head, char* surname) 
-{
-	Position temp = Head->next;
-	Head = FindBefore(temp);
-
-	if (NULL == Head) printf("Error\n");
+	if (NULL == Head) 
+		printf("Error!\n");
 	else {
 		temp = Head->next;
 		Head->next = temp->next;
 		free(temp);
 	}
 	return EXIT_SUCCESS;
+}
+
+Position FindBefore(char* surname, Position P) {//adresa head-a
+	Position prev = P;
+	P = P->next;
+	while (P!=NULL && (strcmp(P->surname, surname)!=0)) {
+		prev = P;
+		P = P->next;
+	}
+	if (P == NULL)
+		return NULL;
+	else
+		return prev;
 }
